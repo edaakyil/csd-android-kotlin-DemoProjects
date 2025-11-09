@@ -31,7 +31,7 @@ public class Server {
 
             var str = br.readLine();
 
-            log.info("Client received from {}:{}", socket.getInetAddress().getHostAddress(), socket.getPort());
+            log.info("Client received from {}: {}", socket.getInetAddress().getHostAddress(), socket.getPort());
             log.info("Received: {}", str);
 
             bw.write("%s\r\n".formatted(str.toUpperCase()));
@@ -57,6 +57,9 @@ public class Server {
 
         try (var serverSocket = new ServerSocket(m_port)) {
             while (true) {
+                // ServerSocket sınıfının accept metodu client'ı karşılar,
+                // accept metodundan dönen Socket ile de doğrudan konuşmayı (veri-alışverişini) gerçekleştiririz.
+                // Server'ın sürekli olarak client geldikçe beklemesi lazım
                 var socket = serverSocket.accept();
 
                 m_executorService.execute(() -> handleClient(socket));

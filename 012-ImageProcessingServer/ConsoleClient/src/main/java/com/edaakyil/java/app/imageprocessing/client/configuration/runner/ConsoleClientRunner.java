@@ -1,4 +1,4 @@
-package com.edaakyil.java.app.imageprocessing.client.runner;
+package com.edaakyil.java.app.imageprocessing.client.configuration.runner;
 
 import com.edaakyil.java.app.imageprocessing.client.Client;
 import org.springframework.boot.ApplicationArguments;
@@ -6,10 +6,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ClientRunner implements ApplicationRunner {
+public class ConsoleClientRunner implements ApplicationRunner {
     private final Client m_client;
 
-    public ClientRunner(Client client)
+    public ConsoleClientRunner(Client client)
     {
         m_client = client;
     }
