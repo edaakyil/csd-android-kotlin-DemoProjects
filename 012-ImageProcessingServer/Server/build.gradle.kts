@@ -34,7 +34,9 @@ dependencies {
 	compileOnly("org.projectlombok:lombok:1.18.38")
 	annotationProcessor("org.projectlombok:lombok")
 
-	implementation("org.openpnp:opencv:4.9.0-0")
+	//implementation("org.openpnp:opencv:4.9.0-0")
+
+    implementation("org.csystem:org-csystem-imageprocessing:8.0.0")
 }
 
 tasks.withType<Test> {

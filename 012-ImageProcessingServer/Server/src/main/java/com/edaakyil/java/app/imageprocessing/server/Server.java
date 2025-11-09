@@ -1,6 +1,9 @@
 package com.edaakyil.java.app.imageprocessing.server;
 
 import lombok.extern.slf4j.Slf4j;
+//import org.opencv.core.Mat;
+//import org.opencv.imgcodecs.Imgcodecs;
+//import org.opencv.imgproc.Imgproc;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,18 @@ public class Server {
 
     @Value("${app.server.port}")
     private int m_port;
+
+    /*
+    private void doGrayScale(String srcPath, String destPath)
+    {
+        var srcMat = Imgcodecs.imread(srcPath);
+        var destMat = new Mat();
+
+        Imgproc.cvtColor(srcMat, destMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgcodecs.imwrite(destPath, destMat);
+    }
+    */
 
     /**
      * Client ile ilgili işlemler bu akış içerisinde karşılanacak
