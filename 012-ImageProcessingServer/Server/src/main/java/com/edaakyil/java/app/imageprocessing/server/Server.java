@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 
 @Component
@@ -19,6 +20,9 @@ public class Server {
 
     @Value("${app.server.port}")
     private int m_port;
+
+    @Value("${app.image.transmission.buffersize}")
+    private int m_bufferSize;
 
     /*
     private void doGrayScale(String srcPath, String destPath)
@@ -39,18 +43,20 @@ public class Server {
     private void handleClient(Socket socket)
     {
         try (socket) {
-            log.info("Client connected from {}:{}", socket.getInetAddress(), socket.getPort());
+            // Client'ın bağlantı bilgilerini yazdırma
+            log.info("Client connected from: {}:{}", socket.getInetAddress(), socket.getPort());
 
-            var br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            var bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            var is = socket.getInputStream();
+            var os = socket.getOutputStream();
 
-            var str = br.readLine();
+            // int'i BigEndian olarak byte dizisine çeviriyor
+            var bufferSizeData = ByteBuffer.allocate(Integer.BYTES).putInt(m_bufferSize).array();
 
-            log.info("Client received from {}: {}", socket.getInetAddress().getHostAddress(), socket.getPort());
-            log.info("Received: {}", str);
+            // bufferSizeData'yı yolluyoruz
+            os.write(bufferSizeData);
 
-            bw.write("%s\r\n".formatted(str.toUpperCase()));
-            bw.flush();
+            log.info("Client received from: {}:{}", socket.getInetAddress().getHostAddress(), socket.getPort());
+
         } catch (IOException ex) {
             log.error("IO Problem occurred while client connected: {}", ex.getMessage());
         } catch (Exception ex) {

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
+import java.nio.ByteBuffer;
 
 @Component
 @Slf4j
@@ -22,21 +22,20 @@ public class Client {
         try (var socket = new Socket(m_host, m_port)) {
             log.info("Connected to {}:{}", m_host, m_port);
 
-            var kb = new Scanner(System.in);
+            var is = socket.getInputStream();
+            var os = socket.getOutputStream();
 
-            System.out.print("Yazı giriniz: ");
-            var str = kb.nextLine();
-            //var str = "Eda";
+            // Client bufferSize bilgisini alıyor
+            var bytes = is.readAllBytes();
 
-            var br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            var bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            if (bytes.length != Integer.BYTES)
+                throw new IOException("Invalid data length");
 
-            bw.write("%s\r\n".formatted(str));
-            bw.flush();
+            // wrap metodu ile bytes dizisini sarmalıyoruz
+            var bufferSize = ByteBuffer.wrap(bytes).getInt();
 
-            var upperStr = br.readLine();
+            log.info("Buffer size: {}", bufferSize);
 
-            log.info("Server Response: {}", upperStr);
         } catch (IOException ex) {
             log.error("IO Problem occurred: {}", ex.getMessage());
         } catch (Exception ex) {
