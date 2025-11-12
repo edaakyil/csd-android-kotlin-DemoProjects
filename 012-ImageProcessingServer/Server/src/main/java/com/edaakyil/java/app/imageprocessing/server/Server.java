@@ -88,8 +88,8 @@ public class Server {
         try (var fos = new FileOutputStream(path)) {
             // Her adımda readImageCallback ile image dosyasının içeriğini okuyup kaydediceğiz
             IntStream.generate(() -> readImageDataCallback(socket, buffer))
-                    .limit(m_maxBufferCount)
                     .takeWhile(len -> len != -1)
+                    .limit(m_maxBufferCount)
                     .forEach(len -> saveImageDataCallback(fos, buffer, len)
             );
         }
