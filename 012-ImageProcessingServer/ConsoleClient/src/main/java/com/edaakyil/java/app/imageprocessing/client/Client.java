@@ -29,20 +29,44 @@ public class Client {
         return ByteBuffer.wrap(bytes).getInt();
     }
 
+    private void sendImage(Socket socket, int bufferSize) throws IOException
+    {
+        var os = socket.getOutputStream();
+
+        // Karşı tarafa dosya ismini gönderme
+        var path = "images/red-kit.jpeg";
+        var bw = new BufferedWriter(new OutputStreamWriter(os));
+        bw.write("red-kit.jpeg\r\n");
+        bw.flush();
+
+        // Dosyadan okuyup karşı tarafa gönderme
+        byte[] buffer = new byte[bufferSize];
+
+        try (var fis = new FileInputStream(path)) { // doğrudan path'den okumayı yapıyoruz
+            int len;
+
+            while ((len = fis.read(buffer)) != -1) {
+                log.info("Len: {}", len);
+
+                os.write(buffer, 0, len);
+            }
+
+            log.info("Len: {}", len);
+        }
+
+    }
+
     public void run()
     {
         try (var socket = new Socket(m_host, m_port)) {
             log.info("Connected to {}:{}", m_host, m_port);
 
             var is = socket.getInputStream();
-            var os = socket.getOutputStream();
-
             var bufSize = readInt(is); // Client bufferSize bilgisini alıyor
-            var maxBufCount = readInt(is); // Client bufferCount bilgisini alıyor
 
-            log.info("Buffer size: {} Max buffer count: {}", bufSize, maxBufCount);
+            log.info("Buffer size: {}", bufSize);
 
-            os.write(ByteBuffer.allocate(Integer.BYTES).putInt(10).array());
+            sendImage(socket, bufSize);
 
         } catch (IOException ex) {
             log.error("IO Problem occurred: {}", ex.getMessage());

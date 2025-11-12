@@ -8,21 +8,34 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.IntStream;
 
 @Component
 @Slf4j
 public class Server {
     private final ExecutorService m_executorService;
+    private final DateTimeFormatter m_dateTimeFormatter;
 
     @Value("${app.server.port}")
     private int m_port;
+
+    @Value("${app.image.directory}")
+    private String m_imagesPath;
 
     @Value("${app.image.transmission.bufsize}")
     private int m_bufferSize;
 
     @Value("${app.image.transmission.maxbufcount}")
     private int m_maxBufferCount;
+
+    public Server(ExecutorService executorService, DateTimeFormatter dateTimeFormatter)
+    {
+        m_executorService = executorService;
+        m_dateTimeFormatter = dateTimeFormatter;
+    }
 
     private int readInt(InputStream is) throws IOException
     {
@@ -35,9 +48,51 @@ public class Server {
         return ByteBuffer.wrap(bytes).getInt();
     }
 
-    private void readAndSaveImage(int bufferCount)
+    private int readImageDataCallback(Socket socket, byte[] buffer)
     {
-        log.info("Buffer count: {}", bufferCount);
+        try {
+            // Okuma yapıyoruz
+            var len = socket.getInputStream().read(buffer);
+            log.info("Len: {}", len);
+
+            return len;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void saveImageDataCallback(FileOutputStream fos, byte[] buffer, int len)
+    {
+        try {
+            // Yazma yapıyoruz
+            fos.write(buffer, 0, len);  // 0'dan len'e kadar okuyacak
+
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void readAndSaveImage(Socket socket, byte[] buffer) throws IOException
+    {
+        var br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        // get filename from Client (dosya ismini okuma)
+        var filename = br.readLine();
+        // dosya isminde noktadan itibaren sonuna kadar ver yani filename'deki uzantı kısmını alma
+        var extension = filename.substring(filename.lastIndexOf('.') + 1); // noktayı bulduğumuz yer -1 olduğu için +1 yazdık
+        // Path belirleme
+        var path = "%s/%s-%s-%s.%s".formatted(
+                m_imagesPath, filename, socket.getInetAddress().getHostAddress(), m_dateTimeFormatter.format(LocalDateTime.now()), extension
+        );
+
+        // Dosyaya kaydetme
+        try (var fos = new FileOutputStream(path)) {
+            // Her adımda readImageCallback ile image dosyasının içeriğini okuyup kaydediceğiz
+            IntStream.generate(() -> readImageDataCallback(socket, buffer))
+                    //.limit(m_maxBufferCount)
+                    .takeWhile(r -> r != -1)
+                    .forEach(r -> saveImageDataCallback(fos, buffer, r)
+            );
+        }
     }
 
     /**
@@ -51,41 +106,18 @@ public class Server {
             log.info("Client connected from: {}:{}", socket.getInetAddress(), socket.getPort());
             //log.info("Client received from: {}:{}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
-            var is = socket.getInputStream();
             var os = socket.getOutputStream();
-
-            byte[] bytes = new byte[Integer.BYTES];
-
             var bufSizeData = ByteBuffer.allocate(Integer.BYTES).putInt(m_bufferSize).array();
-            var bufCountData = ByteBuffer.allocate(Integer.BYTES).putInt(m_maxBufferCount).array();
 
             os.write(bufSizeData);
-            os.write(bufCountData);
 
-            if (is.read(bytes) != Integer.BYTES) {
-                os.write(ByteBuffer.allocate(Integer.BYTES).putInt(-1).array()); // -1 is our error code: You sent incorrect data.
-                return;
-            }
-
-            var bufCount = ByteBuffer.wrap(bytes).getInt();
-
-            if (bufCount > m_maxBufferCount) {
-                os.write(ByteBuffer.allocate(Integer.BYTES).putInt(0).array()); // -1 is our error code: You sent more data than expected.
-                return;
-            }
-
-            readAndSaveImage(bufCount);
+            readAndSaveImage(socket, new byte[m_bufferSize]);
 
         } catch (IOException ex) {
             log.error("IO Problem occurred while client connected: {}", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problem occurred while client connected: {}", ex.getMessage());
         }
-    }
-
-    public Server(ExecutorService executorService)
-    {
-        m_executorService = executorService;
     }
 
     /**
