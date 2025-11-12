@@ -1,9 +1,6 @@
 package com.edaakyil.java.app.imageprocessing.server;
 
 import lombok.extern.slf4j.Slf4j;
-//import org.opencv.core.Mat;
-//import org.opencv.imgcodecs.Imgcodecs;
-//import org.opencv.imgproc.Imgproc;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,20 +18,27 @@ public class Server {
     @Value("${app.server.port}")
     private int m_port;
 
-    @Value("${app.image.transmission.buffersize}")
+    @Value("${app.image.transmission.bufsize}")
     private int m_bufferSize;
 
-    /*
-    private void doGrayScale(String srcPath, String destPath)
+    @Value("${app.image.transmission.maxbufcount}")
+    private int m_maxBufferCount;
+
+    private int readInt(InputStream is) throws IOException
     {
-        var srcMat = Imgcodecs.imread(srcPath);
-        var destMat = new Mat();
+        byte[] bytes = new byte[Integer.BYTES];
 
-        Imgproc.cvtColor(srcMat, destMat, Imgproc.COLOR_BGR2GRAY);
+        if (is.read(bytes) != Integer.BYTES)
+            throw new IOException("Invalid data length");
 
-        Imgcodecs.imwrite(destPath, destMat);
+        // wrap metodu ile bytes dizisini sarmalıyoruz
+        return ByteBuffer.wrap(bytes).getInt();
     }
-    */
+
+    private void readAndSaveImage(int bufferCount)
+    {
+
+    }
 
     /**
      * Client ile ilgili işlemler bu akış içerisinde karşılanacak
@@ -45,17 +49,32 @@ public class Server {
         try (socket) {
             // Client'ın bağlantı bilgilerini yazdırma
             log.info("Client connected from: {}:{}", socket.getInetAddress(), socket.getPort());
+            //log.info("Client received from: {}:{}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
             var is = socket.getInputStream();
             var os = socket.getOutputStream();
 
-            // int'i BigEndian olarak byte dizisine çeviriyor
-            var bufferSizeData = ByteBuffer.allocate(Integer.BYTES).putInt(m_bufferSize).array();
+            byte[] bytes = new byte[Integer.BYTES];
 
-            // bufferSizeData'yı yolluyoruz
-            os.write(bufferSizeData);
+            var bufSizeData = ByteBuffer.allocate(Integer.BYTES).putInt(m_bufferSize).array();
+            var bufCountData = ByteBuffer.allocate(Integer.BYTES).putInt(m_maxBufferCount).array();
 
-            log.info("Client received from: {}:{}", socket.getInetAddress().getHostAddress(), socket.getPort());
+            os.write(bufSizeData);
+            os.write(bufCountData);
+
+            if (is.read(bytes) != Integer.BYTES) {
+                os.write(ByteBuffer.allocate(Integer.BYTES).putInt(-1).array()); // -1 is our error code: You sent incorrect data.
+                return;
+            }
+
+            var bufCount = ByteBuffer.wrap(bytes).getInt();
+
+            if (bufCount > m_maxBufferCount) {
+                os.write(ByteBuffer.allocate(Integer.BYTES).putInt(0).array()); // -1 is our error code: You sent more data than expected.
+                return;
+            }
+
+            readAndSaveImage(bufCount);
 
         } catch (IOException ex) {
             log.error("IO Problem occurred while client connected: {}", ex.getMessage());

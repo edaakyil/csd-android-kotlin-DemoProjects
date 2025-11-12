@@ -17,6 +17,18 @@ public class Client {
     @Value("${server.imageprocessing.port}")
     private int m_port;
 
+    private int readInt(InputStream is) throws IOException
+    {
+        byte[] bytes = new byte[Integer.BYTES];
+
+        if (is.read(bytes) != Integer.BYTES)
+            throw new IOException("Invalid data length");
+
+        // wrap metodu ile bytes dizisini sarmalıyoruz
+        //return ByteBuffer.wrap(bytes).getInt(0);
+        return ByteBuffer.wrap(bytes).getInt();
+    }
+
     public void run()
     {
         try (var socket = new Socket(m_host, m_port)) {
@@ -25,16 +37,10 @@ public class Client {
             var is = socket.getInputStream();
             var os = socket.getOutputStream();
 
-            // Client bufferSize bilgisini alıyor
-            var bytes = is.readAllBytes();
+            var bufSize = readInt(is); // Client bufferSize bilgisini alıyor
+            var maxBufCount = readInt(is); // Client bufferCount bilgisini alıyor
 
-            if (bytes.length != Integer.BYTES)
-                throw new IOException("Invalid data length");
-
-            // wrap metodu ile bytes dizisini sarmalıyoruz
-            var bufferSize = ByteBuffer.wrap(bytes).getInt();
-
-            log.info("Buffer size: {}", bufferSize);
+            log.info("Buffer size: {} Max buffer count: {}", bufSize, maxBufCount);
 
         } catch (IOException ex) {
             log.error("IO Problem occurred: {}", ex.getMessage());
