@@ -1,6 +1,7 @@
 package com.edaakyil.java.app.imageprocessing.server;
 
 import lombok.extern.slf4j.Slf4j;
+import org.csystem.image.OpenCVUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -93,6 +94,9 @@ public class Server {
                     .forEach(len -> saveImageDataCallback(fos, buffer, len)
             );
         }
+
+        // Aldığımız görüntüyü işleme
+        OpenCVUtil.grayScale(path, path + "gs.jpeg");
     }
 
     /**

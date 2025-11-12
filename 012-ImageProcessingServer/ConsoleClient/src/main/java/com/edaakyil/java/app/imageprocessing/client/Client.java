@@ -53,7 +53,7 @@ public class Client {
                 os.write(buffer, 0, len);
             }
 
-            //os.flush();
+            os.flush();
 
             log.info("Len: {}", len);
             log.info("Total: {}", total);
