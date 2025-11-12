@@ -44,14 +44,19 @@ public class Client {
 
         try (var fis = new FileInputStream(path)) { // doğrudan path'den okumayı yapıyoruz
             int len;
+            int total = 0;
 
             while ((len = fis.read(buffer)) != -1) {
                 log.info("Len: {}", len);
 
+                total += len;
                 os.write(buffer, 0, len);
             }
 
+            //os.flush();
+
             log.info("Len: {}", len);
+            log.info("Total: {}", total);
         }
 
     }
