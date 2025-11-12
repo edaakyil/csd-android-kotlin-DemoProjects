@@ -37,7 +37,7 @@ public class Server {
 
     private void readAndSaveImage(int bufferCount)
     {
-
+        log.info("Buffer count: {}", bufferCount);
     }
 
     /**

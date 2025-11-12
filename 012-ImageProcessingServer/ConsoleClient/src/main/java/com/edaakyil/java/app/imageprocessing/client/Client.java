@@ -42,6 +42,8 @@ public class Client {
 
             log.info("Buffer size: {} Max buffer count: {}", bufSize, maxBufCount);
 
+            os.write(ByteBuffer.allocate(Integer.BYTES).putInt(10).array());
+
         } catch (IOException ex) {
             log.error("IO Problem occurred: {}", ex.getMessage());
         } catch (Exception ex) {
