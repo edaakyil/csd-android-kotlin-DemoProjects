@@ -24,7 +24,7 @@ class Server(private val mThreadPool: ExecutorService) {
     private fun handleClient(socket: Socket) {
         socket.use { s ->
             try {
-                mLogger.info("Client connected: {}:{}", socket.inetAddress.hostAddress, socket.port)
+                mLogger.info("Client connected: {}:{}", socket.inetAddress.hostAddress  , socket.port)
 
                 s.soTimeout = SOCKET_TIMEOUT
 
@@ -32,7 +32,7 @@ class Server(private val mThreadPool: ExecutorService) {
                 val min = TcpUtil.receiveInt(s)  // Client'dan sonra min'i alacak
                 val max = TcpUtil.receiveInt(s)  // Client'dan sonra max'ı alacak
 
-                if (max > mTextMaxLength) {
+                if (max - min > mTextMaxLength) {
                     TcpUtil.sendInt(s, MAX_LENGTH_ERROR)  // karşı tarafa (client'a) unsuccess kodu olarak 1 gönderiyoruz
                     return
                 }
