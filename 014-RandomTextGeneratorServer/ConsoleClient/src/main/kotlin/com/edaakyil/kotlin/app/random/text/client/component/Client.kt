@@ -21,11 +21,15 @@ class Client(private val mThreadPool: ExecutorService) {
 
     fun start() {
         try {
+            // Server'ın socket'inin timeout'dan kurtulmak için önce Client'dan count, min, max değerleri alınacak sonra socket açılacak
+            val count = readLong("Input count: ", "Invalid value!...")
+            val min = readInt("Input min: ", "Invalid value!...")
+            val max = readInt("Input max: ", "Invalid value!...")
+
             Socket(mServerHost, mServerPort).use { s ->
-                val count = readLong("Input count: ", "Invalid value!...")
                 TcpUtil.sendLong(s, count) // Server'a count bilgisini gönderilecek
-                TcpUtil.sendInt(s, readInt("Input min: ", "Invalid value!..."))
-                TcpUtil.sendInt(s, readInt("Input max: ", "Invalid value!..."))
+                TcpUtil.sendInt(s, min)
+                TcpUtil.sendInt(s, max)
 
                 // Şimdi success kodu veya unsuccess elde edeceğiz:
                 //mLogger.info("Result: {}", TcpUtil.receiveInt(s))

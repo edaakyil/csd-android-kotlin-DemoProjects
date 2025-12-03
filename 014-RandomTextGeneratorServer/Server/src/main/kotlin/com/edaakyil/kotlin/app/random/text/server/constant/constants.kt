@@ -1,6 +1,6 @@
 package com.edaakyil.kotlin.app.random.text.server.constant
 
-const val SOCKET_TIMEOUT = 10000
+const val SOCKET_TIMEOUT = 1000
 
 const val SUCCESS = 0
 const val MAX_LENGTH_ERROR = 1

@@ -24,9 +24,9 @@ class Server(private val mThreadPool: ExecutorService) {
     private fun handleClient(socket: Socket) {
         socket.use { s ->
             try {
-                mLogger.info("Client connected: {}:{}", socket.inetAddress.address, socket.port)
+                mLogger.info("Client connected: {}:{}", socket.inetAddress.hostAddress, socket.port)
 
-                s.soTimeout = SOCKET_TIMEOUT  // socket timeout -> 10 saniyeden fazla beklememesi için
+                s.soTimeout = SOCKET_TIMEOUT
 
                 val count = TcpUtil.receiveLong(s) // Önce client'ın kaç tane istediği bilgisi gelecek
                 val min = TcpUtil.receiveInt(s)  // Client'dan sonra min'i alacak
