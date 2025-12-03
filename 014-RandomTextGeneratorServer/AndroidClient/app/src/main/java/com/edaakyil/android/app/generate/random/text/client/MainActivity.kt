@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import com.edaakyil.android.app.generate.random.text.client.constant.DEFAULT_HOST
+import com.edaakyil.android.app.generate.random.text.client.constant.DEFAULT_PORT
+import com.edaakyil.android.app.generate.random.text.client.constant.SERVER_INFO_KEY
 import com.edaakyil.android.app.generate.random.text.client.databinding.ActivityMainBinding
 import com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerInfo
 
@@ -16,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mBinding.activity = this
-        mBinding.serverInfo = ServerInfo("172.26.16.1", "6767")
+        mBinding.serverInfo = ServerInfo(DEFAULT_HOST, DEFAULT_PORT)
     }
 
     private fun initialize() {
@@ -36,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onStartButtonClicked() {
         Intent(this, RandomTextActivity::class.java).apply {
-            putExtra("SERVER_INFO", mBinding.serverInfo)
+            putExtra(SERVER_INFO_KEY, mBinding.serverInfo)
             startActivity(this)
         }
     }

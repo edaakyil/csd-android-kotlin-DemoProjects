@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import com.edaakyil.android.app.generate.random.text.client.constant.SERVER_INFO_KEY
 import com.edaakyil.android.app.generate.random.text.client.databinding.ActivityRandomTextBinding
 import com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerInfo
 import com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerParam
@@ -15,8 +16,13 @@ class RandomTextActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityRandomTextBinding
     private lateinit var mServerInfo: ServerInfo
 
+    private fun serverInfo() = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU)
+        intent.getSerializableExtra(SERVER_INFO_KEY, ServerInfo::class.java) as ServerInfo
+    else
+        intent.getSerializableExtra(SERVER_INFO_KEY) as ServerInfo
+
     private fun initServerInfo() {
-        mServerInfo = intent.getSerializableExtra("SERVER_INFO") as ServerInfo
+        mServerInfo = serverInfo()
     }
 
     private fun initBinding() {
