@@ -1,5 +1,8 @@
 package com.edaakyil.kotlin.app.random.text.client.component
 
+import com.karandev.util.net.TcpUtil
+import org.csystem.kotlin.util.console.readInt
+import org.csystem.kotlin.util.console.readLong
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,7 +21,20 @@ class Client(private val mThreadPool: ExecutorService) {
 
     fun start() {
         try {
-            Socket(mServerHost, mServerPort).use {
+            Socket(mServerHost, mServerPort).use { s ->
+                val count = readLong("Input count: ", "Invalid value!...")
+                TcpUtil.sendLong(s, count) // Server'a count bilgisini gönderilecek
+                TcpUtil.sendInt(s, readInt("Input min: ", "Invalid value!..."))
+                TcpUtil.sendInt(s, readInt("Input max: ", "Invalid value!..."))
+
+                // Şimdi success kodu veya unsuccess elde edeceğiz:
+                //mLogger.info("Result: {}", TcpUtil.receiveInt(s))
+                val statusCode = TcpUtil.receiveInt(s)
+                mLogger.info("Result: {}", statusCode)
+
+                if (statusCode == 0)
+                    // Şimdi Server'dan gelecek olan text'leri okumaya başlayacağız:
+                    generateSequence(0) { it + 1 }.takeWhile { it < count }.forEach { _ -> println(TcpUtil.receiveStringViaLength(s)) }
 
             }
         } catch (ex: Exception) {

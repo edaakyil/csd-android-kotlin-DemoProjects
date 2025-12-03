@@ -1,11 +1,15 @@
 package com.edaakyil.kotlin.app.random.text.server.component
 
+import com.edaakyil.kotlin.app.random.text.server.constant.*
+import com.karandev.util.net.TcpUtil
+import org.csystem.kotlin.util.string.randomTextEN
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.ExecutorService
+import kotlin.random.Random
 
 @Component
 class Server(private val mThreadPool: ExecutorService) {
@@ -18,8 +22,45 @@ class Server(private val mThreadPool: ExecutorService) {
     private var mTextMaxLength = 0
 
     private fun handleClient(socket: Socket) {
-        socket.use {
-            mLogger.info("Client connected: {}:{}", socket.remoteSocketAddress, socket.port)
+        socket.use { s ->
+            try {
+                mLogger.info("Client connected: {}:{}", socket.inetAddress.address, socket.port)
+
+                s.soTimeout = SOCKET_TIMEOUT  // socket timeout -> 10 saniyeden fazla beklememesi için
+
+                val count = TcpUtil.receiveLong(s) // Önce client'ın kaç tane istediği bilgisi gelecek
+                val min = TcpUtil.receiveInt(s)  // Client'dan sonra min'i alacak
+                val max = TcpUtil.receiveInt(s)  // Client'dan sonra max'ı alacak
+
+                if (max > mTextMaxLength) {
+                    TcpUtil.sendInt(s, MAX_LENGTH_ERROR)  // karşı tarafa (client'a) unsuccess kodu olarak 1 gönderiyoruz
+                    return
+                }
+
+                if (max < min) {
+                    TcpUtil.sendInt(s, MAX_MIN_ERROR)
+                    return
+                }
+
+                if (count <= 0) {
+                    TcpUtil.sendInt(s, COUNT_NOT_POSITIVE_ERROR)
+                    return
+                }
+
+                TcpUtil.sendInt(s, SUCCESS) // success kodu gönderiyoruz
+
+                // 0'den başlayacak ve (it < count) olduğu sürece dönen bir döngü oluşturduk:
+                generateSequence(0) { it + 1 }.takeWhile { it < count }.forEach { _ ->
+                    // Her adımda karşı tarafa text gönderiyoruz
+                    TcpUtil.sendStringViaLength(s, Random.randomTextEN(Random.nextInt(min, max + 1)))
+                }
+
+            } catch (ex: Exception) {
+                mLogger.error("Client disconnected: {}", ex.message)
+
+                // Burada connection kesildiği için burada artık elimizde socket yok bu yüzden burada unsuccess kodu göndermemizin bir manası yok:
+                //TcpUtil.sendInt(s, -1)
+            }
         }
     }
 
