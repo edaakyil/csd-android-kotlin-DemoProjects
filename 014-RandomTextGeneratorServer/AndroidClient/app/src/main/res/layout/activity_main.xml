@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerInfo" />
+        <import type="com.edaakyil.android.app.generate.random.text.client.MainActivity" />
+
+        <variable name="activity" type="MainActivity" />
+        <variable name="serverInfo" type="ServerInfo" />
+    </data>
+
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/mainActivityMainLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_marginHorizontal="32dp"
+        tools:context=".MainActivity">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="56dp"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:text="@string/main_activity_title"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:hint="@string/edit_text_host_hint"
+            android:text="@={serverInfo.host}" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:inputType="number"
+            android:hint="@string/edit_text_port_hint"
+            android:text="@={serverInfo.port}" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_start_text"
+            android:onClick="@{() -> activity.onStartButtonClicked()}" />
+
+    </LinearLayout>
+</layout>

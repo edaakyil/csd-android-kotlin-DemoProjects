@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerParam" />
+        <import type="com.edaakyil.android.app.generate.random.text.client.RandomTextActivity" />
+        <import type="android.widget.ArrayAdapter" />
+
+        <variable name="activity" type="RandomTextActivity" />
+        <variable name="adapter" type="ArrayAdapter&lt;String&gt;" />
+        <variable name="serverParam" type="ServerParam" />
+    </data>
+
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/randomTextActivityMainLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_marginHorizontal="32dp"
+        tools:context=".RandomTextActivity">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:inputType="number"
+            android:hint="@string/edit_text_count_hint"
+            android:text="@={serverParam.count}" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:inputType="number"
+            android:hint="@string/edit_text_min_length_hint"
+            android:text="@={serverParam.minLength}" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:inputType="number"
+            android:hint="@string/edit_text_max_length_hint"
+            android:text="@={serverParam.maxLength}" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/button_get_text"
+            android:onClick="@{() -> activity.onGetButtonClicked()}" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adapter="@{adapter}" />
+
+    </LinearLayout>
+</layout>
