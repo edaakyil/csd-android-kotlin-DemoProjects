@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService
 class ClientRunner(private val mThreadPool: ExecutorService, private val mClient: Client) : CommandLineRunner {
     override fun run(vararg args: String) {
         mThreadPool.execute { mClient.start() }
+        mThreadPool.shutdown()
     }
 }
 
