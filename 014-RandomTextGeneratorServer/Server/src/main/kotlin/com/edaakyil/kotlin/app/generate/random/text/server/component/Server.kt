@@ -1,6 +1,10 @@
-package com.edaakyil.kotlin.app.random.text.server.component
+package com.edaakyil.kotlin.app.generate.random.text.server.component
 
-import com.edaakyil.kotlin.app.random.text.server.constant.*
+import com.edaakyil.kotlin.app.generate.random.text.server.constant.COUNT_NOT_POSITIVE_ERROR
+import com.edaakyil.kotlin.app.generate.random.text.server.constant.MAX_LENGTH_ERROR
+import com.edaakyil.kotlin.app.generate.random.text.server.constant.MAX_MIN_ERROR
+import com.edaakyil.kotlin.app.generate.random.text.server.constant.SOCKET_TIMEOUT
+import com.edaakyil.kotlin.app.generate.random.text.server.constant.SUCCESS
 import com.karandev.util.net.TcpUtil
 import org.csystem.kotlin.util.string.randomTextEN
 import org.slf4j.LoggerFactory

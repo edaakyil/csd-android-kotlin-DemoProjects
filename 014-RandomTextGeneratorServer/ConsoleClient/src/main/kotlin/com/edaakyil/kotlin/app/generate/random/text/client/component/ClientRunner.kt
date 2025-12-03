@@ -1,4 +1,4 @@
-package com.edaakyil.kotlin.app.random.text.client.component
+package com.edaakyil.kotlin.app.generate.random.text.client.component
 
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component

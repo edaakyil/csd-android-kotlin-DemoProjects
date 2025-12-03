@@ -1,4 +1,4 @@
-package com.edaakyil.kotlin.app.random.text.client
+package com.edaakyil.kotlin.app.generate.random.text.client
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

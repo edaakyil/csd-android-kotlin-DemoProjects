@@ -1,4 +1,4 @@
-package com.edaakyil.kotlin.app.random.text.server.constant
+package com.edaakyil.kotlin.app.generate.random.text.server.constant
 
 const val SOCKET_TIMEOUT = 1000
 

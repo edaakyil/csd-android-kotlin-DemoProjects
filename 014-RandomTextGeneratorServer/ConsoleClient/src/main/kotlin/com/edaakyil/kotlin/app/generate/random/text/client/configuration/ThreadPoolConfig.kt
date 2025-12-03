@@ -1,4 +1,4 @@
-package com.edaakyil.kotlin.app.random.text.client.configuration
+package com.edaakyil.kotlin.app.generate.random.text.client.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

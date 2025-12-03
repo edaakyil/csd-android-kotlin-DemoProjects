@@ -1,11 +1,11 @@
-package com.edaakyil.kotlin.app.random.text.server
+package com.edaakyil.kotlin.app.generate.random.text.client
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ServerApplication
+class App
 
 fun main(args: Array<String>) {
-	runApplication<ServerApplication>(*args)
+	runApplication<App>(*args)
 }

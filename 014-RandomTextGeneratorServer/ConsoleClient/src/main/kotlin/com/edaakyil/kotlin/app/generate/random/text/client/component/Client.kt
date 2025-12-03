@@ -1,4 +1,4 @@
-package com.edaakyil.kotlin.app.random.text.client.component
+package com.edaakyil.kotlin.app.generate.random.text.client.component
 
 import com.karandev.util.net.TcpUtil
 import org.csystem.kotlin.util.console.readInt
