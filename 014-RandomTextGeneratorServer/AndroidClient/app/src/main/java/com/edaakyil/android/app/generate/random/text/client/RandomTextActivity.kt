@@ -14,12 +14,19 @@ import com.edaakyil.android.app.generate.random.text.client.databinding.Activity
 import com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerInfo
 import com.edaakyil.android.app.generate.random.text.client.viewmodel.ServerParam
 import com.karandev.util.net.TcpUtil
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.Socket
+import java.util.concurrent.ExecutorService
+import javax.inject.Inject
 import kotlin.concurrent.thread
 
+@AndroidEntryPoint
 class RandomTextActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityRandomTextBinding
     private lateinit var mServerInfo: ServerInfo
+
+    @Inject
+    lateinit var threadPool: ExecutorService
 
     private fun getTextsForEachCallback(socket: Socket, index: Int) {
         // Server'dan gelecek olan text'leri okumayı yapıyoruz. Bunun için thread içinde olmamız gerekiyor.
@@ -105,7 +112,7 @@ class RandomTextActivity : AppCompatActivity() {
 
             // İnternet erişimi için thread lazım. Bu yüzden burada bir thread açacağız:
             // Thread'i ayrıca sonlandırmamıza gerek yok çünkü zaten bu, sonlanan bir thread.
-            thread { getTextsCallback(count, minLength, maxLength) }
+            threadPool.execute { getTextsCallback(count, minLength, maxLength) }
 
         } catch (ex: NumberFormatException) {
             Log.e("number-format-exception", "${ex.message}")
