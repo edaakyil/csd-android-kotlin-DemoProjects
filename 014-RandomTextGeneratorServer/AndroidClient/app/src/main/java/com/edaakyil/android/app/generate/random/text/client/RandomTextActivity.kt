@@ -21,12 +21,12 @@ class RandomTextActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityRandomTextBinding
     private lateinit var mServerInfo: ServerInfo
 
-    private fun getTextsForEachCallback(socket: Socket) {
+    private fun getTextsForEachCallback(socket: Socket, index: Int) {
         // Server'dan gelecek olan text'leri okumayı yapıyoruz. Bunun için thread içinde olmamız gerekiyor.
         // Bu yüzden bu kısmı runOnUiThread'in dışında yapıyoruz ve şu an bu fonksiyon thread'de çağırılıyor.
         // Eğer bu kısmı runOnUiThread içerisinde yaparsak ui thread'de yapmış oluruz ve ana thread'de diğerinin işini yapmış oluruz.
         // Bunun exception kısmı, bu fonksiyonun çağrıldığı yerde exception handling yapıldığı için burada yapmıyoruz.
-        val text = TcpUtil.receiveStringViaLength(socket)
+        val text = "${index + 1}. " + TcpUtil.receiveStringViaLength(socket)
 
         // adapter'a ekleme yapabilmek için main thread içinde olmamız lazım
         runOnUiThread { mBinding.adapter?.add(text) }
@@ -52,7 +52,8 @@ class RandomTextActivity : AppCompatActivity() {
                 }
 
                 // Artık karşı tarafdan (Server'dan) text'leri alacağız:
-                generateSequence(0) { it + 1 }.takeWhile { it < count }.forEach { _ -> getTextsForEachCallback(s) }
+                generateSequence(0) { it + 1 }.takeWhile { it < count }.forEach { it -> getTextsForEachCallback(s, it) }
+                //generateSequence(0) { it + 1 }.takeWhile { it < count }.forEach { getTextsForEachCallback(s, it) }
             }
         } catch (ex: Exception) {
             // main thread içinde olmadığımız için main thread'de işlem yapmak için runOnUiThread kullandık:
@@ -96,6 +97,8 @@ class RandomTextActivity : AppCompatActivity() {
 
     fun onGetButtonClicked() {
         try {
+            mBinding.adapter!!.clear()
+
             val count = mBinding.serverParam!!.count.toLong()
             val minLength = mBinding.serverParam!!.minLength.toInt()
             val maxLength = mBinding.serverParam!!.maxLength.toInt()
