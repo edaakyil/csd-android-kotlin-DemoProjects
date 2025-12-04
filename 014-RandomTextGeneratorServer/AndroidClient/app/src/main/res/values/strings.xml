@@ -12,5 +12,5 @@
     <string name="button_start_text">START</string>
     <string name="button_get_text">GET</string>
 
-    <string name="not_number_message">Must be a number</string>
+    <string name="not_number_message">%s must be a number!…</string>
 </resources>
